@@ -1,10 +1,25 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class LoginScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+const baseUrl = "http://localhost:41041/api/v1/user";
+
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final loginUrl = "$baseUrl/signin";
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
   Widget build(BuildContext context) {
+    test();
     return Scaffold(
       backgroundColor: Colors.cyan,
       body: Padding(
@@ -52,9 +67,9 @@ class LoginScreen extends StatelessWidget {
                 ),
               ],
             ),
-            txtfld("Email"),
+            txtfld("Email", emailController),
             const SizedBox(height: 16),
-            txtfld("Password"),
+            txtfld("Password", passwordController),
             const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -68,7 +83,7 @@ class LoginScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () {},
+              onPressed: reqLogin,
               child: const Text("Sign In"),
             ),
           ],
@@ -77,8 +92,27 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  TextField txtfld(email) {
+  void test() async {
+    final response =
+        await http.get(Uri.parse('http://localhost:41041/api/v1/blog/bulk'));
+    print(response.body);
+  }
+
+  Future<String> reqLogin() async {
+    final email = emailController.text;
+    final password = passwordController.text;
+    final body = {'email': email, 'password': password};
+    print(body);
+    print(body);
+    final response =
+        await http.post(Uri.parse(loginUrl), body: jsonEncode(body));
+    print(response.body);
+    return response.body;
+  }
+
+  TextField txtfld(email, controller) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
         hintText: email,
         fillColor: const Color.fromARGB(155, 200, 235, 235),
